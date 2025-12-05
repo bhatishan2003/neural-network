@@ -25,14 +25,11 @@ class NeuralNetork:
         else:
             raise ValueError("Unknown activation function")
 
-        # ----- SIMPLE RANDOM INITIALIZATION (no Xavier/He) -----
         self.W1 = np.random.randn(input_size, hidden_size) * 0.1
         self.b1 = np.zeros((1, hidden_size))
 
         self.W2 = np.random.randn(hidden_size, 1) * 0.1
         self.b2 = np.zeros((1, 1))
-
-    # ---------------- ACTIVATIONS ---------------- #
 
     def relu(self, x):
         return np.maximum(0, x)
@@ -49,7 +46,6 @@ class NeuralNetork:
         return dx
 
     def sigmoid(self, x):
-        # PURE SIGMOID (no clipping)
         return 1 / (1 + np.exp(-x))
 
     def sigmoid_derivative(self, x):
@@ -62,23 +58,17 @@ class NeuralNetork:
     def tanh_derivative(self, x):
         return 1 - np.tanh(x) ** 2
 
-    # ---------------- LOSS + DERIVATIVE ---------------- #
-
     def mse(self, y_true, y_pred):
         return np.mean((y_true - y_pred) ** 2)
 
     def mse_derivative(self, y_true, y_pred):
         return 2 * (y_pred - y_true) / y_true.shape[0]
 
-    # ---------------- FORWARD ---------------- #
-
     def forward(self, X):
         self.z1 = np.dot(X, self.W1) + self.b1
         self.a1 = self.activation(self.z1)
         self.z2 = np.dot(self.a1, self.W2) + self.b2
         return self.z2
-
-    # ---------------- BACKWARD ---------------- #
 
     def backward(self, X, y):
         y_pred = self.z2
@@ -100,12 +90,9 @@ class NeuralNetork:
         self.b1 -= self.lr * db1
 
 
-# ---------------- MAIN SCRIPT ---------------- #
-
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--activation", type=str, default="relu",
-                        choices=["sigmoid", "tanh", "relu", "leaky_relu"])
+    parser.add_argument("--activation", type=str, default="relu", choices=["sigmoid", "tanh", "relu", "leaky_relu"])
     parser.add_argument("--epochs", type=int, default=1000)
     parser.add_argument("--lr", type=float, default=0.005)
     parser.add_argument("--hidden", type=int, default=32)
@@ -121,12 +108,7 @@ def main():
     X = scaler.fit_transform(X)
 
     # Model
-    model = NeuralNetork(
-        input_size=X.shape[1],
-        hidden_size=args.hidden,
-        activation=args.activation,
-        lr=args.lr
-    )
+    model = NeuralNetork(input_size=X.shape[1], hidden_size=args.hidden, activation=args.activation, lr=args.lr)
 
     # Training loop
     for epoch in range(args.epochs):
